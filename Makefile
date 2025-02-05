@@ -13,7 +13,9 @@ endif
 
 .PHONY: build
 build: $(GOBIN)
-	go build -mod=vendor -v $(BUILD_ARGS) -o $(GOBIN) ./cmd/...
+# TODO: add vendoring
+# go build -mod=vendor -v $(BUILD_ARGS) -o $(GOBIN) ./cmd/...
+	go build -v $(BUILD_ARGS) -o $(GOBIN) ./cmd/...
 
 .PHONY: clean
 clean:
@@ -22,20 +24,25 @@ clean:
 $(GOBIN):
 	mkdir -p $(GOBIN)
 
-.PHONY: vendor
-vendor:
-		go mod tidy
-		go mod vendor
+# TODO: add vendoring
+# .PHONY: vendor
+# vendor:
+# 		go mod tidy
+# 		go mod vendor
 
 include bin-deps.mk
 
 .PHONY: run-server
 run-server:
-	go run -mod=vendor $(CURDIR)/cmd/server
+# TODO: add vendoring
+# go run -mod=vendor $(CURDIR)/cmd/server
+	go run $(CURDIR)/cmd/server
 
 .PHONY: run-agent
 run-agent:
-	go run -mod=vendor $(CURDIR)/cmd/agent
+# TODO: add vendoring
+# go run -mod=vendor $(CURDIR)/cmd/agent
+	go run $(CURDIR)/cmd/agent
 
 .PHONY: test-short
 test-short:
@@ -59,11 +66,11 @@ lint: $(GOLANGCI_BIN)
 generate:
 	go generate ./...
 
-.PHONY: db-reset
-db-reset:
-	mv db.sqlite3 db-prev.sqlite3
-	go run -mod=vendor $(CURDIR)/cmd/server --migrate
+# .PHONY: db-reset
+# db-reset:
+# 	mv db.sqlite3 db-prev.sqlite3
+# 	go run -mod=vendor $(CURDIR)/cmd/server --migrate
 
-.PHONY: db-populate
-db-populate:
-	sqlite3 db.sqlite3 < fixtures/fixtures.sql
+# .PHONY: db-populate
+# db-populate:
+# 	sqlite3 db.sqlite3 < fixtures/fixtures.sql
