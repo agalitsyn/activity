@@ -3,10 +3,7 @@ package activity
 import (
 	"encoding/json"
 	"io"
-	"path/filepath"
 	"time"
-
-	"github.com/natefinch/lumberjack"
 )
 
 type Entry struct {
@@ -18,18 +15,9 @@ type LogActivityWriter struct {
 	io.WriteCloser
 }
 
-func NewLogActivityWriter() *LogActivityWriter {
-	// TODO: to config
-	logFile := &lumberjack.Logger{
-		Filename:   filepath.Join("logs", "activity.log"),
-		MaxSize:    100,
-		MaxBackups: 7,
-		MaxAge:     14,
-		Compress:   true,
-	}
-
+func NewLogActivityWriter(w io.WriteCloser) *LogActivityWriter {
 	return &LogActivityWriter{
-		WriteCloser: logFile,
+		WriteCloser: w,
 	}
 }
 
