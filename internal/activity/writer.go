@@ -3,13 +3,9 @@ package activity
 import (
 	"encoding/json"
 	"io"
-	"time"
-)
 
-type Entry struct {
-	CreatedAt time.Time `json:"created_at"`
-	Apps      []App     `json:"apps"`
-}
+	"github.com/agalitsyn/activity/internal/model"
+)
 
 type LogActivityWriter struct {
 	io.WriteCloser
@@ -21,7 +17,7 @@ func NewLogActivityWriter(w io.WriteCloser) *LogActivityWriter {
 	}
 }
 
-func (w *LogActivityWriter) WriteEntry(entry Entry) error {
+func (w *LogActivityWriter) WriteEntry(entry model.ActivityEntry) error {
 	b, err := json.Marshal(entry)
 	if err != nil {
 		return err

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/agalitsyn/flagutils"
 )
@@ -13,6 +14,11 @@ const EnvPrefix = "ACTIVITY"
 
 type Config struct {
 	Debug bool
+
+	HTTP struct {
+		Addr               string
+		ShutdownTimeoutSec time.Duration
+	}
 
 	runPrintVersion bool
 	runMigrate      bool
@@ -35,9 +41,14 @@ func ParseFlags() Config {
 	flag.BoolVar(&cfg.runPrintVersion, "version", false, "Show version.")
 	flag.BoolVar(&cfg.runMigrate, "migrate", false, "Migrate.")
 
+	flag.StringVar(&cfg.HTTP.Addr, "http-addr", "localhost:8080", "HTTP service address.")
+	httpShutdownTimeoutSec := flag.Int("http-shutdown", 10, "HTTP service graceful shutdown timeout (sec).")
+
 	flagutils.Prefix = EnvPrefix
 	flagutils.Parse()
 	flag.Parse()
+
+	cfg.HTTP.ShutdownTimeoutSec = time.Duration(*httpShutdownTimeoutSec) * time.Second
 
 	return cfg
 }

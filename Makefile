@@ -66,6 +66,19 @@ lint: $(GOLANGCI_BIN)
 generate:
 	go generate ./...
 
+.PHONY: vendor-server-static
+vendor-server-static:
+	mkdir -pv cmd/server/static/vendor/htmx.org@2.0.4 && \
+		wget -O cmd/server/static/vendor/htmx.org@2.0.4/htmx.min.js https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js && \
+	mkdir -pv cmd/server/static/vendor/bootstrap@5.3.3 && \
+		wget -O cmd/server/static/vendor/bootstrap@5.3.3/bootstrap.min.css https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css && \
+		wget -O cmd/server/static/vendor/bootstrap@5.3.3/bootstrap.bundle.min.js https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js
+	mkdir -pv cmd/server/static/vendor/popperjs@@2.11.8 && \
+		wget -O cmd/server/static/vendor/popperjs@@2.11.8/popper.min.js https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js
+	mkdir -pv cmd/server/static/vendor/bootstrap-icons@1.11.3 && \
+		wget -O cmd/server/static/vendor/bootstrap-icons@1.11.3/bootstrap-icons.min.css https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css
+
+
 # .PHONY: db-reset
 # db-reset:
 # 	mv db.sqlite3 db-prev.sqlite3

@@ -1,0 +1,10 @@
+{{define "title"}}Client list{{end}}
+
+<!-- prettier:ignore -->
+{{define "content"}}
+
+<div id="content" hx-get="/client-list" hx-trigger="every 1s">
+    <h2>Client list</h2>
+    {{ template "client-list" . }}
+</div>
+{{ end }}
