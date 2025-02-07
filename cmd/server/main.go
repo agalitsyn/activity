@@ -39,7 +39,7 @@ func main() {
 
 	templates, err := renderer.NewTemplateCache(EmbedFiles, "templates", templateFuncs())
 	if err != nil {
-		log.Panicln("could not load templates:", err)
+		log.Fatalln("could not load templates:", err)
 	}
 
 	htmlRenderer := renderer.NewHTMLRenderer(renderer.NewTemplateRenderer(templates))

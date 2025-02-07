@@ -51,7 +51,6 @@ func (s *WebSocketController) HandleAgent(w http.ResponseWriter, r *http.Request
 	if errors.Is(err, model.ErrAgentNotFound) {
 		agent := model.Agent{ID: host}
 		if err = s.agentStorage.CreateAgent(agent); err != nil {
-			log.Println("ERROR connection:", err)
 			http.Error(w, "connection error", http.StatusInternalServerError)
 			return
 		}
@@ -62,7 +61,7 @@ func (s *WebSocketController) HandleAgent(w http.ResponseWriter, r *http.Request
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("ERROR failed to upgrade to WebSocket:", err)
+		log.Println("ERROR failed to upgrade to ws:", err)
 		return
 	}
 	defer func() {
@@ -77,7 +76,7 @@ func (s *WebSocketController) HandleAgent(w http.ResponseWriter, r *http.Request
 	}()
 
 	if err := s.writeWelcomeMsg(conn); err != nil {
-		log.Println("ERROR write welcome message", err)
+		log.Println("ERROR write welcome message:", err)
 		return
 	}
 	// Send updates to all browser connections after new agent connected
@@ -90,7 +89,7 @@ func (s *WebSocketController) HandleAgent(w http.ResponseWriter, r *http.Request
 			log.Println("ERROR read ws:", err)
 			break
 		}
-		log.Printf("DEBUG received: %v %s", messageType, message)
+		log.Printf("DEBUG received: %v %s:", messageType, message)
 
 		// TODO: remove echo
 		if err := conn.WriteMessage(messageType, message); err != nil {
@@ -103,7 +102,7 @@ func (s *WebSocketController) HandleAgent(w http.ResponseWriter, r *http.Request
 func (s *WebSocketController) broadcastAgentList() {
 	agents, err := s.agentStorage.FetchAgents()
 	if err != nil {
-		log.Println("ERROR fetch agents", err)
+		log.Println("ERROR fetch agents:", err)
 		return
 	}
 
@@ -114,7 +113,7 @@ func (s *WebSocketController) broadcastAgentList() {
 		}
 
 		if err := s.writeAgentsListMsg(conn, agents); err != nil {
-			log.Println("ERROR write agents list message", err)
+			log.Println("ERROR write agents list message:", err)
 		}
 
 		return true
@@ -130,7 +129,7 @@ func (s *WebSocketController) StartPeriodicBroadcast(ctx context.Context, interv
 		for {
 			select {
 			case t := <-ticker.C:
-				log.Println("DEBUG run broadcast", t.Format())
+				log.Println("DEBUG run broadcast", t.Format(time.RFC3339))
 				s.broadcastAgentList()
 			case <-ctx.Done():
 				return
@@ -142,13 +141,13 @@ func (s *WebSocketController) StartPeriodicBroadcast(ctx context.Context, interv
 func (s *WebSocketController) HandleBrowser(w http.ResponseWriter, r *http.Request) {
 	agents, err := s.agentStorage.FetchAgents()
 	if err != nil {
-		log.Println("ERROR fetch agents", err)
+		log.Println("ERROR fetch agents:", err)
 		return
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("ERROR failed to upgrade to WebSocket:", err)
+		log.Println("ERROR failed to upgrade to ws:", err)
 		return
 	}
 	defer conn.Close()
@@ -158,12 +157,12 @@ func (s *WebSocketController) HandleBrowser(w http.ResponseWriter, r *http.Reque
 	defer s.browserConns.Delete(connID)
 
 	if err := s.writeWelcomeMsg(conn); err != nil {
-		log.Println("ERROR write welcome message", err)
+		log.Println("ERROR write welcome message:", err)
 		return
 	}
 
 	if err := s.writeAgentsListMsg(conn, agents); err != nil {
-		log.Println("ERROR write agents list message", err)
+		log.Println("ERROR write agents list message:", err)
 		return
 	}
 

@@ -14,6 +14,8 @@ const EnvPrefix = "ACTIVITY"
 type Config struct {
 	Debug bool
 
+	ConnectionURL string
+
 	runPrintVersion bool
 }
 
@@ -30,7 +32,7 @@ func ParseFlags() Config {
 	var cfg Config
 
 	flag.BoolVar(&cfg.Debug, "debug", false, "Debug mode.")
-
+	flag.StringVar(&cfg.ConnectionURL, "url", "ws://localhost:8080/agent", "Connection URL.")
 	flag.BoolVar(&cfg.runPrintVersion, "version", false, "Show version.")
 
 	flagutils.Prefix = EnvPrefix

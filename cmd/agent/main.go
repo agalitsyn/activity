@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/go-pkgz/lgr"
+	"github.com/gorilla/websocket"
 	"github.com/natefinch/lumberjack"
 	"github.com/progrium/darwinkit/macos"
 	"github.com/progrium/darwinkit/macos/appkit"
@@ -47,6 +49,21 @@ func launch(app appkit.Application, delegate *appkit.ApplicationDelegate) {
 		log.Printf("DEBUG running with config %v", cfg.String())
 	}
 
+	conn, _, err := websocket.DefaultDialer.Dial(cfg.ConnectionURL, nil)
+	if err != nil {
+		log.Fatal("could not connect to server:", err)
+	}
+
+	// close websocket on application termination
+	delegate.SetApplicationWillTerminate(func(notification foundation.Notification) {
+		err := conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+		if err != nil {
+			log.Println("ERROR write close:", err)
+		}
+
+		conn.Close()
+	})
+
 	fetcher := activity.NewFetcher()
 
 	// TODO: to config
@@ -62,23 +79,38 @@ func launch(app appkit.Application, delegate *appkit.ApplicationDelegate) {
 
 	// TODO: to config
 	pollInterval := 1
-	foundation.Timer_ScheduledTimerWithTimeIntervalRepeatsBlock(foundation.TimeInterval(pollInterval), true, func(timer foundation.Timer) {
-		apps, err := fetcher.CurrentApps()
-		if err != nil {
-			log.Printf("ERROR failed to fetch apps: %v", err)
-			return
-		}
+	foundation.Timer_ScheduledTimerWithTimeIntervalRepeatsBlock(
+		foundation.TimeInterval(pollInterval),
+		true,
+		func(timer foundation.Timer) {
+			apps, err := fetcher.CurrentApps()
+			if err != nil {
+				log.Printf("ERROR failed to fetch apps: %v", err)
+				return
+			}
 
-		entry := model.ActivityEntry{
-			CreatedAt: time.Now(),
-			Apps:      apps,
-		}
-		log.Printf("DEBUG %+v", entry)
+			entry := model.ActivityEntry{
+				CreatedAt: time.Now().Unix(),
+				Apps:      apps,
+			}
 
-		if err := writer.WriteEntry(entry); err != nil {
-			log.Printf("ERROR failed to write entry: %v", err)
-		}
-	})
+			b, err := json.Marshal(entry)
+			if err != nil {
+				log.Printf("ERROR failed to serialize activity entry: %v", err)
+				return
+			}
+			log.Println("DEBUG", string(b))
+
+			if err := writer.Write(b); err != nil {
+				log.Printf("ERROR failed to write entry: %v", err)
+			}
+
+			if err := conn.WriteMessage(websocket.TextMessage, b); err != nil {
+				log.Println("ERROR write:", err)
+				return
+			}
+		},
+	)
 }
 
 func setupLogger(debug bool) {

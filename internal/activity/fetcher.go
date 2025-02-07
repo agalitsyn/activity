@@ -29,10 +29,17 @@ func (f *Fetcher) CurrentApps() ([]model.App, error) {
 				continue
 			}
 
+			var launchedAt int64
+			launchDate := app.LaunchDate()
+			if launchDate.Ptr() != nil {
+				// Convert NSDate timeIntervalSince1970 to Go time.Time
+				launchedAt = int64(launchDate.TimeIntervalSince1970())
+			}
+
 			apps = append(apps, model.App{
-				Name:     name,
-				IsActive: app.IsActive(),
-				// LaunchedAt: foundation.DateFrom(app.LaunchDate()),
+				Name:       name,
+				IsActive:   app.IsActive(),
+				LaunchedAt: launchedAt,
 			})
 		}
 	})
