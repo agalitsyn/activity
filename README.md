@@ -5,7 +5,7 @@ This is POC of activity tracking system.
 ## Purpose
 
 1. Context for virtual office. Bob is listening Spotify and Alice is coding in editor.
-2. Time tracking, how much apps was used during some time period.
+2. Time tracking, how much apps was used during some time period. Bob was wathing youtube in Chrome for 6 hours in row, but Alice was using VSCode for 10 hours.
 
 
 ## Local run
