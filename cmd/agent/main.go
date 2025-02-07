@@ -89,7 +89,7 @@ func launch(app appkit.Application, delegate *appkit.ApplicationDelegate) {
 				return
 			}
 
-			entry := model.ActivityEntry{
+			entry := model.Message{
 				CreatedAt: time.Now().Unix(),
 				Apps:      apps,
 			}

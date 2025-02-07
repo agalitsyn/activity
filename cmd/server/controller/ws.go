@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -47,9 +48,9 @@ func (s *WebSocketController) HandleAgent(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	_, err = s.agentStorage.FetchAgent(host)
+	agent, err := s.agentStorage.FetchAgent(host)
 	if errors.Is(err, model.ErrAgentNotFound) {
-		agent := model.Agent{ID: host}
+		agent = model.Agent{ID: host}
 		if err = s.agentStorage.CreateAgent(agent); err != nil {
 			http.Error(w, "connection error", http.StatusInternalServerError)
 			return
@@ -84,17 +85,30 @@ func (s *WebSocketController) HandleAgent(w http.ResponseWriter, r *http.Request
 
 	// keep connection
 	for {
-		messageType, message, err := conn.ReadMessage()
+		_, rawMessage, err := conn.ReadMessage()
 		if err != nil {
 			log.Println("ERROR read ws:", err)
 			break
 		}
-		log.Printf("DEBUG received: %v %s:", messageType, message)
+		log.Printf("DEBUG received: %s:", rawMessage)
 
-		// TODO: remove echo
-		if err := conn.WriteMessage(messageType, message); err != nil {
-			log.Println("ERROR write ws:", err)
-			break
+		var message model.Message
+		if err := json.Unmarshal(rawMessage, &message); err != nil {
+			log.Println("ERROR unmarshal message:", err)
+			continue
+		}
+
+		activeApp := ""
+		for _, app := range message.Apps {
+			if app.IsActive {
+				activeApp = app.Name
+				break
+			}
+		}
+		agent.ActiveApp = activeApp
+
+		if err := s.agentStorage.UpdateAgent(agent); err != nil {
+			log.Println("ERROR update agent:", err)
 		}
 	}
 }
@@ -192,7 +206,8 @@ func (s *WebSocketController) writeAgentsListMsg(conn *websocket.Conn, agents []
         <tr>
             <td>%d</td>
             <td>%s</td>
-        </tr>`, i+1, agent.ID))
+			<td>%s</td>
+        </tr>`, i+1, agent.ID, agent.ActiveApp))
 	}
 	if len(agents) == 0 {
 		rows.WriteString(`<tr><td colspan="99" class="text-center">No clients</td></tr>`)

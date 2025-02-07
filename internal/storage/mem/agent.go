@@ -54,3 +54,16 @@ func (s *AgentStorage) FetchAgents() ([]model.Agent, error) {
 	}
 	return agents, nil
 }
+
+func (s *AgentStorage) UpdateAgent(agent model.Agent) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	_, ok := s.data[agent.ID]
+	if !ok {
+		return model.ErrAgentNotFound
+	}
+
+	s.data[agent.ID] = agent
+	return nil
+}

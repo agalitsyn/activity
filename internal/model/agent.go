@@ -3,14 +3,16 @@ package model
 import "errors"
 
 type Agent struct {
-	ID string
+	ID        string
+	ActiveApp string
 }
 
 var ErrAgentNotFound = errors.New("agent not found")
 
 type AgentRepository interface {
 	FetchAgent(id string) (Agent, error)
-	CreateAgent(c Agent) error
+	CreateAgent(agent Agent) error
 	DeleteAgent(id string) error
 	FetchAgents() ([]Agent, error)
+	UpdateAgent(agent Agent) error
 }

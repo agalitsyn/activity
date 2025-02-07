@@ -6,7 +6,7 @@ type App struct {
 	LaunchedAt int64  `json:"launched_at,omitempty"`
 }
 
-type ActivityEntry struct {
+type Message struct {
 	CreatedAt int64 `json:"created_at"`
 	Apps      []App `json:"apps"`
 }
