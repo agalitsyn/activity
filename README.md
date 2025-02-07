@@ -119,3 +119,10 @@ Different approach: use browser extension (maybe with Rust and WASM) and run sub
 - Secure connection (wss)
 - Blocking and removing agents
 - Performance testing
+
+### Both
+
+- Testing
+- Packaging
+- Deployment
+- Metrics
