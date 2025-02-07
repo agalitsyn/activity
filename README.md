@@ -33,6 +33,7 @@ How we display which app is active on each host:
 - Each agent is connected to server
 - Server accepts agents connections and updates list, on disconnect it removes agent from list. Also server keeps all browser connections the same way.
 - Updated state from agents goes to hub and sends to all browsers using broadcast message
+- Browser updates data from websocket using htmx and websocket extension
 
 How we count how many hours app was in use?
 - We share message struct in [protocol](./internal/model/protocol.go) file and unpack it on server
@@ -51,12 +52,12 @@ How we count how many hours app was in use?
 +-------------+           |   |         |    +--^---+---+             |     |       |                    |
 |             |           |   |         |       |   |                 |     |       |                    |
 |             |           |   |         |    +--+---v---+             |     |       +--------------------+
-| agent host 1|           |   |         |    | storage  |             |     |                             
-|             |     ws    |   |         |    |          |             |     |                             
-|             +-----------+   |         |    |          |             |     |                             
-|             |               |         |    |          |             |     |                             
-|             |               |         |    +----------+             |     |                             
-|             |               |         +---------+-------------------+     |                             
+| agent host 1|           |   |         |    | storage  |             |     |
+|             |     ws    |   |         |    |          |             |     |
+|             +-----------+   |         |    |          |             |     |
+|             |               |         |    |          |             |     |
+|             |               |         |    +----------+             |     |
+|             |               |         +---------+-------------------+     |
 +-------------+               |                   |                         |       +--------------------+
                               |                   |                         |       |   browser 2        |
                               |                   |                         |       |                    |
@@ -68,9 +69,9 @@ How we count how many hours app was in use?
 |             +---------------+               +---v----+                            |                    |
 |             |                               |        |                            |                    |
 |             |                               | tsdb   |                            +--------------------+
-|             |                               |        |                                                  
-+-------------+                               |        |                                                  
-                                              +--------+                                                  
+|             |                               |        |
++-------------+                               |        |
+                                              +--------+
 ```
 
 ### Scaling
@@ -78,7 +79,7 @@ How we count how many hours app was in use?
 To scale server for many messages we can:
 - Use multiple instances os server
     - Split load by agents: can create balancing algorithm based on number of connections.
-    - Add new service - Control panel. UI part should be removed from server to Control panel.
+    - UI part should be removed from server. We can add new service - Control panel and create internal RPC between server and Control panel. Control panel can have API for frontend, and UI part can be separated into frontend app.
 - Use binary protocol between agent and server
 - Use batch send and compression
 - Use logic similar to WAL in databases. Store raw data in some chunks for recovery, but rest data will be pre-aggregated in chunks on host and sended to server.
@@ -109,6 +110,8 @@ Improve agents:
 - Binary self-protection
 - Handling websocket reconnections
 - Send parts of data from log after being offline
+
+Different approach: use browser extension (maybe with Rust and WASM) and run subprocess to fetch the same data and send to server.
 
 ### Server
 
