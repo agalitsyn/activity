@@ -1,0 +1,19 @@
+from(bucket: "activity")
+  |> range(start: -24h)
+  |> filter(fn: (r) => r._measurement == "app_activity")
+  |> filter(fn: (r) => r._field == "is_active")
+  |> filter(fn: (r) => r._value == true)
+  |> group(columns: ["app_name"])
+  |> reduce(
+    fn: (r, accumulator) => ({
+      count: accumulator.count + 1,
+      total_time: accumulator.total_time + float(v: uint(v: r._time) - uint(v: r._start)),
+      app_name: r.app_name
+    }),
+    identity: {count: 0, total_time: 0.0, app_name: ""}
+  )
+  |> map(fn: (r) => ({
+    r with
+    duration_minutes: r.total_time / 60000000000.0
+  }))
+  |> sort(columns: ["duration_minutes"], desc: true)

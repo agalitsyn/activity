@@ -13,8 +13,6 @@ endif
 
 .PHONY: build
 build: $(GOBIN)
-# TODO: add vendoring
-# go build -mod=vendor -v $(BUILD_ARGS) -o $(GOBIN) ./cmd/...
 	go build -v $(BUILD_ARGS) -o $(GOBIN) ./cmd/...
 
 .PHONY: clean
@@ -24,24 +22,15 @@ clean:
 $(GOBIN):
 	mkdir -p $(GOBIN)
 
-# TODO: add vendoring
-# .PHONY: vendor
-# vendor:
-# 		go mod tidy
-# 		go mod vendor
 
 include bin-deps.mk
 
 .PHONY: run-server
 run-server:
-# TODO: add vendoring
-# go run -mod=vendor $(CURDIR)/cmd/server
 	go run $(CURDIR)/cmd/server
 
 .PHONY: run-agent
 run-agent:
-# TODO: add vendoring
-# go run -mod=vendor $(CURDIR)/cmd/agent
 	go run $(CURDIR)/cmd/agent
 
 .PHONY: test-short
@@ -80,12 +69,6 @@ vendor-server-static:
 	mkdir -pv cmd/server/static/vendor/bootstrap-icons@1.11.3 && \
 		wget -O cmd/server/static/vendor/bootstrap-icons@1.11.3/bootstrap-icons.min.css https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css
 
-
-# .PHONY: db-reset
-# db-reset:
-# 	mv db.sqlite3 db-prev.sqlite3
-# 	go run -mod=vendor $(CURDIR)/cmd/server --migrate
-
-# .PHONY: db-populate
-# db-populate:
-# 	sqlite3 db.sqlite3 < fixtures/fixtures.sql
+.PHONY: db-init
+db-init:
+	docker exec -it influxdb influx setup --org activity --bucket activity --username admin --password adminadmin --token secret --force
