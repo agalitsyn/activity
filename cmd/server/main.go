@@ -55,10 +55,13 @@ func main() {
 		fmt.Fprintln(os.Stdout, names)
 	}
 
-	clientStorage := mem.NewClientStorage()
+	agentStorage := mem.NewAgentStorage()
 
-	pageCtrl := controller.NewPageController(htmlRenderer, clientStorage)
-	webSocketCtrl := controller.NewWebsocketController(clientStorage)
+	pageCtrl := controller.NewPageController(htmlRenderer)
+	webSocketCtrl := controller.NewWebsocketController(htmlRenderer, agentStorage)
+
+	// Push updates to all connected browsers to ensure data consistency
+	go webSocketCtrl.StartPeriodicBroadcast(ctx, 5*time.Second)
 
 	h := NewRouter(
 		pageCtrl,

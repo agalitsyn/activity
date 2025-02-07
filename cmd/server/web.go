@@ -17,7 +17,7 @@ import (
 
 func NewRouter(
 	pageCtrl *controller.PageController,
-	wsCtrl *controller.WebSocketContoller,
+	wsCtrl *controller.WebSocketController,
 ) *routegroup.Bundle {
 	router := routegroup.New(http.NewServeMux())
 
@@ -33,7 +33,8 @@ func NewRouter(
 		w.WriteHeader(200)
 	})
 
-	router.HandleFunc("/ws", wsCtrl.HandleWebSocket)
+	router.HandleFunc("/agent", wsCtrl.HandleAgent)
+	router.HandleFunc("/browser", wsCtrl.HandleBrowser)
 	router.HandleFunc("/", pageCtrl.HomePage)
 	return router
 }

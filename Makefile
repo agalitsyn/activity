@@ -70,6 +70,8 @@ generate:
 vendor-server-static:
 	mkdir -pv cmd/server/static/vendor/htmx.org@2.0.4 && \
 		wget -O cmd/server/static/vendor/htmx.org@2.0.4/htmx.min.js https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js && \
+	mkdir -pv cmd/server/static/vendor/htmx-ext-ws@2.0.1 && \
+		wget -O cmd/server/static/vendor/htmx-ext-ws@2.0.1/ws.js https://unpkg.com/htmx-ext-ws@2.0.1/ws.js
 	mkdir -pv cmd/server/static/vendor/bootstrap@5.3.3 && \
 		wget -O cmd/server/static/vendor/bootstrap@5.3.3/bootstrap.min.css https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css && \
 		wget -O cmd/server/static/vendor/bootstrap@5.3.3/bootstrap.bundle.min.js https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js

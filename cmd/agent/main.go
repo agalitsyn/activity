@@ -16,6 +16,7 @@ import (
 	"github.com/progrium/darwinkit/macos/foundation"
 
 	"github.com/agalitsyn/activity/internal/activity"
+	"github.com/agalitsyn/activity/internal/model"
 	"github.com/agalitsyn/activity/version"
 )
 
@@ -68,7 +69,7 @@ func launch(app appkit.Application, delegate *appkit.ApplicationDelegate) {
 			return
 		}
 
-		entry := activity.Entry{
+		entry := model.ActivityEntry{
 			CreatedAt: time.Now(),
 			Apps:      apps,
 		}

@@ -1,10 +1,10 @@
-{{define "title"}}Client list{{end}}
+{{define "title"}}Virtual office{{end}}
 
 <!-- prettier:ignore -->
 {{define "content"}}
 
-<div id="content" hx-get="/client-list" hx-trigger="every 1s">
-    <h2>Client list</h2>
+<div id="content">
+    <h2>Who is online?</h2>
     {{ template "client-list" . }}
 </div>
 {{ end }}
