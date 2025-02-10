@@ -4,27 +4,14 @@ This is POC of activity tracking system.
 
 ## Purpose
 
-1. Context for virtual office. Bob is listening Spotify and Alice is coding in editor.
+1. Context for virtual office. Bob is watching YouTube and Alice is coding in editor.
+
+![Demo](./screenshots/demo_1.png)
+
 2. Time tracking, how much apps was used during some time period. Bob was wathing youtube in Chrome for 6 hours in row, but Alice was using VSCode for 10 hours.
 
+![Demo](./screenshots/demo_2.jpg)
 
-## Local run
-
-Copy config template:
-
-```sh
-cp .env.example .env
-```
-
-Fill config variables values in `.env`
-
-Then run needed app:
-
-```sh
-make run-server
-# OR
-make run-agent
-```
 
 ## Architecture
 
@@ -93,9 +80,9 @@ Improve agents:
 ### Agent
 
 - Apps introspection
-    - Need to integrate with popular apps, each app is different
+    - Need to integrate with popular apps, each app is different and requires specific scripts
         - Which track is playing in Spotify, what tab is opened in browser?
-            - apple script, dbus-send, smth for Windows?
+            - Apple script, dbus-send, smth for Windows?
         - Which app is runned in terminal, what if I use vim or tmux?
             - can be captured by PS util in UNUX, but IDK in Windows
     - Need black list of apps which cannot to be captured by agent
@@ -126,3 +113,33 @@ Different approach: use browser extension (maybe with Rust and WASM) and run sub
 - Packaging
 - Deployment
 - Metrics
+
+## Local run
+
+1. Install XCode (required for agent)
+
+2. Copy config template:
+
+```sh
+cp .env.example .env
+```
+
+Fill config variables values in `.env`
+
+3. Run apps:
+
+First run server
+
+```sh
+make run-server
+# OR
+make run-agent
+```
+
+Then run agent
+
+```sh
+make run-agent
+```
+
+Now open `http://localhost:8080/` in browser.
