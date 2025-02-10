@@ -131,8 +131,6 @@ First, run the server:
 
 ```sh
 make run-server
-# OR
-make run-agent
 ```
 
 Then, run the agent:
