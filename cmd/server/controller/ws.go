@@ -99,13 +99,20 @@ func (s *WebSocketController) HandleAgent(w http.ResponseWriter, r *http.Request
 		}
 
 		activeApp := ""
+		activeAppContext := ""
 		for _, app := range message.Apps {
 			if app.IsActive {
 				activeApp = app.Name
+				if app.Context != nil {
+					for k, v := range app.Context {
+						activeAppContext += fmt.Sprintf("%s: %s\n", k, v)
+					}
+				}
 				break
 			}
 		}
 		agent.ActiveApp = activeApp
+		agent.ActiveAppContext = activeAppContext
 
 		if err := s.agentStorage.UpdateAgent(agent); err != nil {
 			log.Println("ERROR update agent:", err)
@@ -182,16 +189,13 @@ func (s *WebSocketController) HandleBrowser(w http.ResponseWriter, r *http.Reque
 
 	// keep connection
 	for {
-		_, messsage, err := conn.ReadMessage()
+		_, _, err := conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("ERROR %v", err)
 			}
 			break
 		}
-
-		// TODO: remove
-		log.Printf("DEBUG %+v", messsage)
 	}
 }
 
@@ -207,7 +211,8 @@ func (s *WebSocketController) writeAgentsListMsg(conn *websocket.Conn, agents []
             <td>%d</td>
             <td>%s</td>
 			<td>%s</td>
-        </tr>`, i+1, agent.ID, agent.ActiveApp))
+			<td>%s</td>
+        </tr>`, i+1, agent.ID, agent.ActiveApp, agent.ActiveAppContext))
 	}
 	if len(agents) == 0 {
 		rows.WriteString(`<tr><td colspan="99" class="text-center">No clients</td></tr>`)

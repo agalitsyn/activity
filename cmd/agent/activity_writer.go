@@ -1,4 +1,4 @@
-package activity
+package main
 
 import (
 	"io"

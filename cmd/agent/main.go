@@ -17,7 +17,6 @@ import (
 	"github.com/progrium/darwinkit/macos/appkit"
 	"github.com/progrium/darwinkit/macos/foundation"
 
-	"github.com/agalitsyn/activity/internal/activity"
 	"github.com/agalitsyn/activity/internal/model"
 	"github.com/agalitsyn/activity/version"
 )
@@ -64,7 +63,7 @@ func launch(app appkit.Application, delegate *appkit.ApplicationDelegate) {
 		conn.Close()
 	})
 
-	fetcher := activity.NewFetcher()
+	fetcher := NewActivityFetcher()
 
 	// TODO: to config
 	activityLogFile := &lumberjack.Logger{
@@ -74,7 +73,7 @@ func launch(app appkit.Application, delegate *appkit.ApplicationDelegate) {
 		MaxAge:     14,
 		Compress:   true,
 	}
-	writer := activity.NewLogActivityWriter(activityLogFile)
+	writer := NewLogActivityWriter(activityLogFile)
 	defer writer.Close()
 
 	// TODO: to config

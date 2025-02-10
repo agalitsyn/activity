@@ -3,8 +3,9 @@ package model
 import "errors"
 
 type Agent struct {
-	ID        string
-	ActiveApp string
+	ID               string
+	ActiveApp        string
+	ActiveAppContext string
 }
 
 var ErrAgentNotFound = errors.New("agent not found")
